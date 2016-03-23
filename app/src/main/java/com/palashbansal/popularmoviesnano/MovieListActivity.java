@@ -48,9 +48,6 @@ public class MovieListActivity extends AppCompatActivity {
 								} else {
 									order = DBConnector.SortOrder.POPULAR;
 								}
-								int temp_size = DBConnector.movieList.size();
-								DBConnector.movieList.clear();
-								recyclerViewAdapter.notifyItemRangeRemoved(0, temp_size);
 								refreshMovieList();
 							}
 						}).create().show();
@@ -62,16 +59,17 @@ public class MovieListActivity extends AppCompatActivity {
 			twoPane = true;
 		}
 
+		DBConnector.movieList.clear();
 		recyclerView = (RecyclerView) findViewById(R.id.movie_list);
 		recyclerViewAdapter = new MovieItemAdapter(DBConnector.movieList, this);
 		setupRecyclerView(recyclerViewAdapter);
-
-		refreshMovieList();
-
 	}
 
 
 	private void refreshMovieList() {
+		int temp_size = DBConnector.movieList.size();
+		DBConnector.movieList.clear();
+		recyclerViewAdapter.notifyItemRangeRemoved(0, temp_size);
 		DBConnector.discover(order, this,
 				new Response.Listener<JSONObject>() {
 					@Override
@@ -116,5 +114,23 @@ public class MovieListActivity extends AppCompatActivity {
 		}
 		recyclerView.setLayoutManager(gridLayoutManager);
 		recyclerView.setAdapter(recyclerViewAdapter);
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putInt("Sort_Order", order.ordinal());
+	}
+
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		order = DBConnector.SortOrder.values()[savedInstanceState.getInt("Sort_Order")];
+	}
+
+	@Override
+	protected void onPostCreate(Bundle savedInstanceState) {
+		super.onPostCreate(savedInstanceState);
+		refreshMovieList();
 	}
 }

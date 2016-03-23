@@ -23,7 +23,6 @@
 				android:scaleType="fitCenter"
 				android:contentDescription="@string/poster_description"
 				android:adjustViewBounds="true"
-				android:src="@drawable/temporary"
 				/>
 	</FrameLayout>
 </FrameLayout>

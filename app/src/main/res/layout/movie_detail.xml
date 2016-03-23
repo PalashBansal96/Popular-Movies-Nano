@@ -44,7 +44,6 @@
 					android:adjustViewBounds="true"
 					android:contentDescription="@string/poster_description"
 					android:id="@+id/poster"
-					android:src="@drawable/temporary"
 					/>
 
 			<TextView

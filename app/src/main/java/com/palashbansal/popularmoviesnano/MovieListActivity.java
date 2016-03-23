@@ -133,7 +133,6 @@ public class MovieListActivity extends AppCompatActivity {
 			extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
 		private final List<MovieItem> mValues;
-		private View lastSelected = null;
 		public SimpleItemRecyclerViewAdapter(List<MovieItem> items) {
 			mValues = items;
 		}
@@ -149,14 +148,10 @@ public class MovieListActivity extends AppCompatActivity {
 		public void onBindViewHolder(final ViewHolder holder, final int position) {
 			holder.mItem = mValues.get(position);
 			Picasso.with(getApplicationContext()).load(holder.mItem.getPosterURL()).into(holder.mImageView);
-
 			holder.mView.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					if (mTwoPane) {
-//						if(lastSelected!=null) lastSelected.setVisibility(View.GONE);
-//						holder.selectedMarker.setVisibility(View.VISIBLE);
-//						lastSelected = holder.selectedMarker;
 						Bundle arguments = new Bundle();
 						arguments.putInt(MovieDetailFragment.ARG_ORDER_ID, position);
 						MovieDetailFragment fragment = new MovieDetailFragment();
@@ -164,16 +159,19 @@ public class MovieListActivity extends AppCompatActivity {
 						getSupportFragmentManager().beginTransaction()
 								.replace(R.id.movie_detail_container, fragment)
 								.commit();
-						if (lastSelected != null) lastSelected.setForeground(null);
-						holder.imageFrame.setForeground(getResources().getDrawable(R.drawable.selected_foreground));
-						lastSelected = holder.imageFrame;
 					} else {
 						Context context = v.getContext();
 						Intent intent = new Intent(context, MovieDetailActivity.class);
 						intent.putExtra(MovieDetailFragment.ARG_ORDER_ID, position);
-
 						context.startActivity(intent);
 					}
+				}
+			});
+			holder.imageFrame.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+				@Override
+				public void onFocusChange(View v, boolean hasFocus) {
+					if (hasFocus)
+						v.performClick();
 				}
 			});
 		}
@@ -184,10 +182,9 @@ public class MovieListActivity extends AppCompatActivity {
 		}
 
 		public class ViewHolder extends RecyclerView.ViewHolder {
-			public final View mView;
-			public final ImageView mImageView;
-			//			public final View selectedMarker;
-			public final FrameLayout imageFrame;
+			public View mView;
+			public ImageView mImageView;
+			public FrameLayout imageFrame;
 			public MovieItem mItem;
 
 			public ViewHolder(View view) {
@@ -196,7 +193,6 @@ public class MovieListActivity extends AppCompatActivity {
 				mView.setClickable(true);
 				imageFrame = (FrameLayout) view.findViewById(R.id.image_frame);
 				mImageView = (ImageView) view.findViewById(R.id.content);
-//				selectedMarker = view.findViewById(R.id.selected_marker);
 			}
 
 			@Override
@@ -204,5 +200,7 @@ public class MovieListActivity extends AppCompatActivity {
 				return super.toString() + " '" + mItem.getTitle() + "'";
 			}
 		}
+
+
 	}
 }

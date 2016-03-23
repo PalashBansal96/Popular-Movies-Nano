@@ -25,20 +25,8 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-/**
- * An activity representing a list of Movies. This activity
- * has different presentations for handset and tablet-size devices. On
- * handsets, the activity presents a list of items, which when touched,
- * lead to a {@link MovieDetailActivity} representing
- * item details. On tablets, the activity presents the list of items and
- * item details side-by-side using two vertical panes.
- */
 public class MovieListActivity extends AppCompatActivity {
 
-	/**
-	 * Whether or not the activity is in two-pane mode, i.e. running on a tablet
-	 * device.
-	 */
 	public static boolean mTwoPane;
 	private DBConnector.SortOrder order = DBConnector.SortOrder.POPULAR;
 	private RecyclerView recyclerView;
@@ -54,7 +42,7 @@ public class MovieListActivity extends AppCompatActivity {
 		setSupportActionBar(toolbar);
 		toolbar.setTitle(getTitle());
 
-		Picasso.with(getApplicationContext()).setIndicatorsEnabled(true);  //TODO: Remove in Production
+//		Picasso.with(getApplicationContext()).setIndicatorsEnabled(true);  //TODO: Remove in Production
 
 		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
@@ -81,10 +69,6 @@ public class MovieListActivity extends AppCompatActivity {
 
 
 		if (findViewById(R.id.movie_detail_container) != null) {
-			// The detail imageFrame view will be present only in the
-			// large-screen layouts (res/values-w900dp).
-			// If this view is present, then the
-			// activity should be in two-pane mode.
 			mTwoPane = true;
 		}
 

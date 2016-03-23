@@ -13,28 +13,11 @@ import com.palashbansal.popularmoviesnano.helpers.DBConnector;
 import com.palashbansal.popularmoviesnano.helpers.MovieItem;
 import com.squareup.picasso.Picasso;
 
-/**
- * A fragment representing a single Movie detail screen.
- * This fragment is either contained in a {@link MovieListActivity}
- * in two-pane mode (on tablets) or a {@link MovieDetailActivity}
- * on handsets.
- */
 public class MovieDetailFragment extends Fragment {
-	/**
-	 * The fragment argument representing the item ID that this fragment
-	 * represents.
-	 */
 	public static final String ARG_ORDER_ID = "order_id";
 
-	/**
-	 * The dummy content this fragment is presenting.
-	 */
 	private MovieItem mItem;
 
-	/**
-	 * Mandatory empty constructor for the fragment manager to instantiate the
-	 * fragment (e.g. upon screen orientation changes).
-	 */
 	public MovieDetailFragment() {
 	}
 
@@ -43,9 +26,6 @@ public class MovieDetailFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 
 		if (getArguments().containsKey(ARG_ORDER_ID)) {
-			// Load the dummy content specified by the fragment
-			// arguments. In a real-world scenario, use a Loader
-			// to load content from a content provider.
 			mItem = DBConnector.movieList.get(getArguments().getInt(ARG_ORDER_ID));
 
 			Activity activity = this.getActivity();
@@ -61,7 +41,6 @@ public class MovieDetailFragment extends Fragment {
 							 Bundle savedInstanceState) {
 		final View rootView = inflater.inflate(R.layout.movie_detail, container, false);
 
-		// Show the dummy content as text in a TextView.
 		populateDetails(rootView);
 		DBConnector.getOtherDetails(mItem, rootView.getContext(), new DBConnector.Listener() {
 			@Override

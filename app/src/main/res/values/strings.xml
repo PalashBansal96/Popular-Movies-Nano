@@ -5,4 +5,5 @@
 	<string name="divide10">/10</string>
 	<string name="overview">Overview</string>
 	<string name="loading"><![CDATA[<Loading>]]></string>
+	<string name="sort_order">Sort By</string>
 </resources>

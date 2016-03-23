@@ -1,10 +1,12 @@
 package com.palashbansal.popularmoviesnano;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -59,17 +61,24 @@ public class MovieListActivity extends AppCompatActivity {
 		fab.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				if(order == DBConnector.SortOrder.POPULAR) {
-					order = DBConnector.SortOrder.TOP_RATED;
-				}else {
-					order = DBConnector.SortOrder.POPULAR;
-				}
-				int temp_size = DBConnector.movieList.size();
-				DBConnector.movieList.clear();
-				recyclerViewAdapter.notifyItemRangeRemoved(0, temp_size);
-				refreshMovieList();
+				AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+				builder.setTitle(R.string.sort_order)
+						.setSingleChoiceItems(R.array.sort_array, order.ordinal(), new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int which) {
+								if (which == 1) {
+									order = DBConnector.SortOrder.TOP_RATED;
+								} else {
+									order = DBConnector.SortOrder.POPULAR;
+								}
+								int temp_size = DBConnector.movieList.size();
+								DBConnector.movieList.clear();
+								recyclerViewAdapter.notifyItemRangeRemoved(0, temp_size);
+								refreshMovieList();
+							}
+						}).create().show();
 			}
 		});
+
 
 		if (findViewById(R.id.movie_detail_container) != null) {
 			// The detail imageFrame view will be present only in the
@@ -77,6 +86,10 @@ public class MovieListActivity extends AppCompatActivity {
 			// If this view is present, then the
 			// activity should be in two-pane mode.
 			mTwoPane = true;
+		}
+
+		if (!mTwoPane) {
+			fab.setVisibility(View.GONE);
 		}
 
 		if(mTwoPane) {

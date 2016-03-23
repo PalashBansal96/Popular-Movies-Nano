@@ -39,7 +39,7 @@ public class MovieListActivity extends AppCompatActivity {
 	 * Whether or not the activity is in two-pane mode, i.e. running on a tablet
 	 * device.
 	 */
-	private boolean mTwoPane;
+	public static boolean mTwoPane;
 	private DBConnector.SortOrder order = DBConnector.SortOrder.POPULAR;
 	private RecyclerView recyclerView;
 	private SimpleItemRecyclerViewAdapter recyclerViewAdapter;

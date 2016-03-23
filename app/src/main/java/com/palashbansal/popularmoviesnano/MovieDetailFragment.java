@@ -77,6 +77,10 @@ public class MovieDetailFragment extends Fragment {
 
 	private void populateDetails(View rootView) {
 		if (mItem != null) {
+			if (MovieListActivity.mTwoPane) {
+				rootView.findViewById(R.id.title_card).setVisibility(View.VISIBLE);
+				((TextView) rootView.findViewById(R.id.movie_title)).setText(mItem.getTitle());
+			}
 			((TextView) rootView.findViewById(R.id.overview)).setText(mItem.getOverview());
 			((TextView) rootView.findViewById(R.id.release_date)).setText(mItem.getRelease_date());
 			((TextView) rootView.findViewById(R.id.vote_average)).setText(String.valueOf(mItem.getPopularity()));

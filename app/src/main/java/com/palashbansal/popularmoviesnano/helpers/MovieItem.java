@@ -6,15 +6,17 @@ package com.palashbansal.popularmoviesnano.helpers;
 public class MovieItem {
 	private int id;
 	private String title;
-	private String imageURL;
+	private String posterURL;
+	private String backdropURL;
 	private String overview;
 	private int popularity;
 	private String release_date;
 
-	public MovieItem(int id, String title, String imageURL, String overview, int popularity, String release_date) {
+	public MovieItem(int id, String title, String posterURL, String backdropURL, String overview, int popularity, String release_date) {
 		this.id = id;
 		this.title = title;
-		this.imageURL = imageURL;
+		this.posterURL = posterURL;
+		this.backdropURL = backdropURL;
 		this.overview = overview;
 		this.popularity = popularity;
 		this.release_date = release_date;
@@ -28,8 +30,8 @@ public class MovieItem {
 		return title;
 	}
 
-	public String getImageURL() {
-		return imageURL;
+	public String getPosterURL() {
+		return posterURL;
 	}
 
 	public String getOverview() {
@@ -46,5 +48,9 @@ public class MovieItem {
 
 	public void setRelease_date(String release_date) {
 		this.release_date = release_date;
+	}
+
+	public String getBackdropURL() {
+		return backdropURL;
 	}
 }

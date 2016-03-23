@@ -2,18 +2,18 @@ package com.palashbansal.popularmoviesnano;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-
-
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.palashbansal.popularmoviesnano.helpers.DBConnector;
@@ -21,7 +21,6 @@ import com.palashbansal.popularmoviesnano.helpers.MovieItem;
 import com.squareup.picasso.Picasso;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,7 +38,6 @@ public class MovieListActivity extends AppCompatActivity {
 	 * device.
 	 */
 	private boolean mTwoPane;
-	private List<MovieItem> movies = new ArrayList<>();
 	private DBConnector.SortOrder order = DBConnector.SortOrder.POPULAR;
 	private RecyclerView recyclerView;
 	private SimpleItemRecyclerViewAdapter recyclerViewAdapter;
@@ -57,6 +55,7 @@ public class MovieListActivity extends AppCompatActivity {
 		Picasso.with(getApplicationContext()).setIndicatorsEnabled(true);  //TODO: Remove in Production
 
 		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
 		fab.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -65,15 +64,15 @@ public class MovieListActivity extends AppCompatActivity {
 				}else {
 					order = DBConnector.SortOrder.POPULAR;
 				}
-				int temp_size = movies.size();
-				movies.clear();
+				int temp_size = DBConnector.movieList.size();
+				DBConnector.movieList.clear();
 				recyclerViewAdapter.notifyItemRangeRemoved(0, temp_size);
 				refreshMovieList();
 			}
 		});
 
 		if (findViewById(R.id.movie_detail_container) != null) {
-			// The detail container view will be present only in the
+			// The detail imageFrame view will be present only in the
 			// large-screen layouts (res/values-w900dp).
 			// If this view is present, then the
 			// activity should be in two-pane mode.
@@ -81,24 +80,41 @@ public class MovieListActivity extends AppCompatActivity {
 		}
 
 		if(mTwoPane) {
-			gridLayoutManager = new GridLayoutManager(this, 3);
-		}else{
 			gridLayoutManager = new GridLayoutManager(this, 2);
+		}else{
+			if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+				gridLayoutManager = new GridLayoutManager(this, 2);
+			} else
+				gridLayoutManager = new GridLayoutManager(this, 4);
 		}
 		recyclerView = (RecyclerView) findViewById(R.id.movie_list);
-		recyclerViewAdapter = new SimpleItemRecyclerViewAdapter(movies);
+		recyclerViewAdapter = new SimpleItemRecyclerViewAdapter(DBConnector.movieList);
 		setupRecyclerView(recyclerViewAdapter);
 
 		refreshMovieList();
 
 	}
 
+
 	private void refreshMovieList() {
 		DBConnector.discover(order, this,
 				new Response.Listener<JSONObject>() {
 					@Override
 					public void onResponse(JSONObject response) {
-						DBConnector.generateMovieObjects(response, movies, recyclerViewAdapter);
+						DBConnector.generateMovieObjects(response, DBConnector.movieList, recyclerViewAdapter, new DBConnector.Listener() {
+							@Override
+							public void onFinished(int error) {
+								if (mTwoPane && !DBConnector.movieList.isEmpty()) {
+									Bundle arguments = new Bundle();
+									arguments.putInt(MovieDetailFragment.ARG_ORDER_ID, 0);
+									MovieDetailFragment fragment = new MovieDetailFragment();
+									fragment.setArguments(arguments);
+									getSupportFragmentManager().beginTransaction()
+											.replace(R.id.movie_detail_container, fragment)
+											.commit();
+								}
+							}
+						});
 					}
 				}, new Response.ErrorListener() {
 					@Override
@@ -117,7 +133,7 @@ public class MovieListActivity extends AppCompatActivity {
 			extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
 		private final List<MovieItem> mValues;
-
+		private View lastSelected = null;
 		public SimpleItemRecyclerViewAdapter(List<MovieItem> items) {
 			mValues = items;
 		}
@@ -130,25 +146,31 @@ public class MovieListActivity extends AppCompatActivity {
 		}
 
 		@Override
-		public void onBindViewHolder(final ViewHolder holder, int position) {
+		public void onBindViewHolder(final ViewHolder holder, final int position) {
 			holder.mItem = mValues.get(position);
-			Picasso.with(getApplicationContext()).load(holder.mItem.getImageURL()).into(holder.mImageView);
+			Picasso.with(getApplicationContext()).load(holder.mItem.getPosterURL()).into(holder.mImageView);
 
 			holder.mView.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					if (mTwoPane) {
+//						if(lastSelected!=null) lastSelected.setVisibility(View.GONE);
+//						holder.selectedMarker.setVisibility(View.VISIBLE);
+//						lastSelected = holder.selectedMarker;
 						Bundle arguments = new Bundle();
-						arguments.putString(MovieDetailFragment.ARG_ITEM_ID, String.valueOf(holder.mItem.getId()));
+						arguments.putInt(MovieDetailFragment.ARG_ORDER_ID, position);
 						MovieDetailFragment fragment = new MovieDetailFragment();
 						fragment.setArguments(arguments);
 						getSupportFragmentManager().beginTransaction()
 								.replace(R.id.movie_detail_container, fragment)
 								.commit();
+						if (lastSelected != null) lastSelected.setForeground(null);
+						holder.imageFrame.setForeground(getResources().getDrawable(R.drawable.selected_foreground));
+						lastSelected = holder.imageFrame;
 					} else {
 						Context context = v.getContext();
 						Intent intent = new Intent(context, MovieDetailActivity.class);
-						intent.putExtra(MovieDetailFragment.ARG_ITEM_ID, holder.mItem.getId());
+						intent.putExtra(MovieDetailFragment.ARG_ORDER_ID, position);
 
 						context.startActivity(intent);
 					}
@@ -164,12 +186,17 @@ public class MovieListActivity extends AppCompatActivity {
 		public class ViewHolder extends RecyclerView.ViewHolder {
 			public final View mView;
 			public final ImageView mImageView;
+			//			public final View selectedMarker;
+			public final FrameLayout imageFrame;
 			public MovieItem mItem;
 
 			public ViewHolder(View view) {
 				super(view);
 				mView = view;
+				mView.setClickable(true);
+				imageFrame = (FrameLayout) view.findViewById(R.id.image_frame);
 				mImageView = (ImageView) view.findViewById(R.id.content);
+//				selectedMarker = view.findViewById(R.id.selected_marker);
 			}
 
 			@Override

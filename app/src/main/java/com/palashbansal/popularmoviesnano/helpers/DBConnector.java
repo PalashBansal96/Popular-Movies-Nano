@@ -1,12 +1,11 @@
 package com.palashbansal.popularmoviesnano.helpers;
 
 import android.content.Context;
-
+import android.support.annotation.Nullable;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-
 import com.palashbansal.popularmoviesnano.MovieListActivity;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,13 +19,12 @@ import java.util.List;
  */
 
 public class DBConnector {
+	public static final List<MovieItem> movieList = new ArrayList<>();
 	private static final String BASE_URL = "https://api.themoviedb.org/3/";
 	private static final String MOVIE_PARAM = "movie/";
 	private static final String DISCOVER_PARAM = "discover/movie";
 	private static final String KEY_PARAM = "?api_key=" + APIKeys.TMDB_KEY;
 	private static final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/w185";
-
-	public enum SortOrder { POPULAR, TOP_RATED }
 
 	public static void getMovie(int id, Context context, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener){
 		String url = BASE_URL + MOVIE_PARAM + id + KEY_PARAM;
@@ -38,8 +36,13 @@ public class DBConnector {
 		getJSONFromGet(url, context, listener, errorListener);
 	}
 
-	private static String generatePosterPath(String posterName){
+	private static String generateImagePath(String posterName) {
 		return IMAGE_BASE_URL + posterName + KEY_PARAM;
+	}
+
+	public static void generateMovieObjects(JSONObject json, List<MovieItem> movieList, MovieListActivity.SimpleItemRecyclerViewAdapter recyclerViewAdapter, Listener listener) {
+		generateMovieObjects(json, movieList, recyclerViewAdapter);
+		listener.onFinished(0);
 	}
 
 	public static void generateMovieObjects(JSONObject json, List<MovieItem> movieList, MovieListActivity.SimpleItemRecyclerViewAdapter recyclerViewAdapter){
@@ -47,8 +50,8 @@ public class DBConnector {
 			JSONArray results = json.getJSONArray("results");
 			for(int i=0; i<results.length();i++){
 				JSONObject obj = results.getJSONObject(i);
-				movieList.add(new MovieItem(obj.getInt("id"), obj.getString("original_title"), generatePosterPath(obj.getString("poster_path")),
-						obj.getString("overview"), obj.getInt("vote_average"), ""));
+				movieList.add(new MovieItem(obj.getInt("id"), obj.getString("original_title"), generateImagePath(obj.getString("poster_path")),
+						generateImagePath(obj.getString("backdrop_path")), obj.getString("overview"), obj.getInt("vote_average"), "<Loading>"));
 				recyclerViewAdapter.notifyItemInserted(i);
 			}
 		} catch (JSONException ignored) {
@@ -57,11 +60,12 @@ public class DBConnector {
 
 	public static void getOtherDetails(ArrayList<MovieItem> movieList, Context context){
 		for(final MovieItem movie: movieList){
-			getOtherDetails(movie, context);
+			getOtherDetails(movie, context, null);
 		}
+
 	}
 
-	public static void getOtherDetails(final MovieItem movie, Context context){
+	public static void getOtherDetails(final MovieItem movie, Context context, @Nullable final Listener listener) {
 		getMovie(movie.getId(), context,
 				new Response.Listener<JSONObject>() {
 					@Override
@@ -70,11 +74,17 @@ public class DBConnector {
 							movie.setRelease_date(response.getString("release_date"));
 						} catch (JSONException ignored) {
 						}
+						if (listener != null) {
+							listener.onFinished(0);
+						}
 					}
 				},
 				new Response.ErrorListener() {
 					@Override
 					public void onErrorResponse(VolleyError error) {
+						if (listener != null) {
+							listener.onFinished(1);
+						}
 					}
 				}
 		);
@@ -86,5 +96,11 @@ public class DBConnector {
 						listener, errorListener
 				),
 				context);
+	}
+
+	public enum SortOrder {POPULAR, TOP_RATED}
+
+	public interface Listener {
+		void onFinished(int error);
 	}
 }

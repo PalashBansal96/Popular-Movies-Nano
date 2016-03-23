@@ -105,7 +105,7 @@ public class MovieListActivity extends AppCompatActivity {
 	private void setupRecyclerView(MovieItemAdapter recyclerViewAdapter) {
 		GridLayoutManager gridLayoutManager;
 		if (twoPane) {
-			gridLayoutManager = new GridLayoutManager(this, 2);
+			gridLayoutManager = new GridLayoutManager(this, 3);
 		} else {
 			if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 				gridLayoutManager = new GridLayoutManager(this, 2);

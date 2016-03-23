@@ -29,7 +29,6 @@ public class MovieDetailActivity extends AppCompatActivity {
 			}
 		});
 
-		// Show the Up button in the action bar.
 		ActionBar actionBar = getSupportActionBar();
 		if (actionBar != null) {
 			actionBar.setDisplayHomeAsUpEnabled(true);
@@ -37,8 +36,6 @@ public class MovieDetailActivity extends AppCompatActivity {
 			actionBar.setTitle(title);
 		}
 		if (savedInstanceState == null) {
-			// Create the detail fragment and add it to the activity
-			// using a fragment transaction.
 			Bundle arguments = new Bundle();
 			arguments.putInt(MovieDetailFragment.ARG_ORDER_ID,
 					getIntent().getIntExtra(MovieDetailFragment.ARG_ORDER_ID, 0));

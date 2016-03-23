@@ -16,7 +16,7 @@ import com.squareup.picasso.Picasso;
 public class MovieDetailFragment extends Fragment {
 	public static final String ARG_ORDER_ID = "order_id";
 
-	private MovieItem mItem;
+	private MovieItem movie;
 
 	public MovieDetailFragment() {
 	}
@@ -26,12 +26,12 @@ public class MovieDetailFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 
 		if (getArguments().containsKey(ARG_ORDER_ID)) {
-			mItem = DBConnector.movieList.get(getArguments().getInt(ARG_ORDER_ID));
+			movie = DBConnector.movieList.get(getArguments().getInt(ARG_ORDER_ID));
 
 			Activity activity = this.getActivity();
 			CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
 			if (appBarLayout != null) {
-				appBarLayout.setTitle(mItem.getTitle());
+				appBarLayout.setTitle(movie.getTitle());
 			}
 		}
 	}
@@ -42,11 +42,11 @@ public class MovieDetailFragment extends Fragment {
 		final View rootView = inflater.inflate(R.layout.movie_detail, container, false);
 
 		populateDetails(rootView);
-		DBConnector.getOtherDetails(mItem, rootView.getContext(), new DBConnector.Listener() {
+		DBConnector.getOtherDetails(movie, rootView.getContext(), new DBConnector.Listener() {
 			@Override
 			public void onFinished(int error) {
 				if (error == 1) {
-					mItem.setRelease_date("Sometime after 1896.");
+					movie.setRelease_date("Sometime after 1896.");
 				}
 				populateDetails(rootView);
 			}
@@ -55,15 +55,15 @@ public class MovieDetailFragment extends Fragment {
 	}
 
 	private void populateDetails(View rootView) {
-		if (mItem != null) {
-			if (MovieListActivity.mTwoPane) {
+		if (movie != null) {
+			if (MovieListActivity.twoPane) {
 				rootView.findViewById(R.id.title_card).setVisibility(View.VISIBLE);
-				((TextView) rootView.findViewById(R.id.movie_title)).setText(mItem.getTitle());
+				((TextView) rootView.findViewById(R.id.movie_title)).setText(movie.getTitle());
 			}
-			((TextView) rootView.findViewById(R.id.overview)).setText(mItem.getOverview());
-			((TextView) rootView.findViewById(R.id.release_date)).setText(mItem.getRelease_date());
-			((TextView) rootView.findViewById(R.id.vote_average)).setText(String.valueOf(mItem.getPopularity()));
-			Picasso.with(rootView.getContext()).load(mItem.getPosterURL()).into((ImageView) rootView.findViewById(R.id.poster));
+			((TextView) rootView.findViewById(R.id.overview)).setText(movie.getOverview());
+			((TextView) rootView.findViewById(R.id.release_date)).setText(movie.getRelease_date());
+			((TextView) rootView.findViewById(R.id.vote_average)).setText(String.valueOf(movie.getPopularity()));
+			Picasso.with(rootView.getContext()).load(movie.getPosterURL()).into((ImageView) rootView.findViewById(R.id.poster));
 		}
 	}
 

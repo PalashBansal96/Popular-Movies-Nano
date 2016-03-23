@@ -1,8 +1,6 @@
 package com.palashbansal.popularmoviesnano;
 
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -11,27 +9,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.palashbansal.popularmoviesnano.helpers.DBConnector;
-import com.palashbansal.popularmoviesnano.helpers.MovieItem;
-import com.squareup.picasso.Picasso;
+import com.palashbansal.popularmoviesnano.helpers.MovieItemAdapter;
 import org.json.JSONObject;
-
-import java.util.List;
 
 public class MovieListActivity extends AppCompatActivity {
 
-	public static boolean mTwoPane;
+	public static boolean twoPane;
 	private DBConnector.SortOrder order = DBConnector.SortOrder.POPULAR;
 	private RecyclerView recyclerView;
-	private SimpleItemRecyclerViewAdapter recyclerViewAdapter;
-	private GridLayoutManager gridLayoutManager;
+	private MovieItemAdapter recyclerViewAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -69,23 +59,11 @@ public class MovieListActivity extends AppCompatActivity {
 
 
 		if (findViewById(R.id.movie_detail_container) != null) {
-			mTwoPane = true;
+			twoPane = true;
 		}
 
-		if (!mTwoPane) {
-			fab.setVisibility(View.GONE);
-		}
-
-		if(mTwoPane) {
-			gridLayoutManager = new GridLayoutManager(this, 2);
-		}else{
-			if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-				gridLayoutManager = new GridLayoutManager(this, 2);
-			} else
-				gridLayoutManager = new GridLayoutManager(this, 4);
-		}
 		recyclerView = (RecyclerView) findViewById(R.id.movie_list);
-		recyclerViewAdapter = new SimpleItemRecyclerViewAdapter(DBConnector.movieList);
+		recyclerViewAdapter = new MovieItemAdapter(DBConnector.movieList, this);
 		setupRecyclerView(recyclerViewAdapter);
 
 		refreshMovieList();
@@ -101,14 +79,8 @@ public class MovieListActivity extends AppCompatActivity {
 						DBConnector.generateMovieObjects(response, DBConnector.movieList, recyclerViewAdapter, new DBConnector.Listener() {
 							@Override
 							public void onFinished(int error) {
-								if (mTwoPane && !DBConnector.movieList.isEmpty()) {
-									Bundle arguments = new Bundle();
-									arguments.putInt(MovieDetailFragment.ARG_ORDER_ID, 0);
-									MovieDetailFragment fragment = new MovieDetailFragment();
-									fragment.setArguments(arguments);
-									getSupportFragmentManager().beginTransaction()
-											.replace(R.id.movie_detail_container, fragment)
-											.commit();
+								if (twoPane && !DBConnector.movieList.isEmpty()) {
+									loadContentInPane(0);
 								}
 							}
 						});
@@ -121,83 +93,28 @@ public class MovieListActivity extends AppCompatActivity {
 				});
 	}
 
-	private void setupRecyclerView(SimpleItemRecyclerViewAdapter recyclerViewAdapter) {
-		recyclerView.setLayoutManager(gridLayoutManager);
-		recyclerView.setAdapter(recyclerViewAdapter);
+	public void loadContentInPane(int position) {
+		if (!twoPane) return;
+		Bundle arguments = new Bundle();
+		arguments.putInt(MovieDetailFragment.ARG_ORDER_ID, position);
+		MovieDetailFragment fragment = new MovieDetailFragment();
+		fragment.setArguments(arguments);
+		getSupportFragmentManager().beginTransaction()
+				.replace(R.id.movie_detail_container, fragment)
+				.commit();
 	}
 
-	public class SimpleItemRecyclerViewAdapter
-			extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
-
-		private final List<MovieItem> mValues;
-		public SimpleItemRecyclerViewAdapter(List<MovieItem> items) {
-			mValues = items;
+	private void setupRecyclerView(MovieItemAdapter recyclerViewAdapter) {
+		GridLayoutManager gridLayoutManager;
+		if (twoPane) {
+			gridLayoutManager = new GridLayoutManager(this, 2);
+		} else {
+			if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+				gridLayoutManager = new GridLayoutManager(this, 2);
+			} else
+				gridLayoutManager = new GridLayoutManager(this, 4);
 		}
-
-		@Override
-		public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-			View view = LayoutInflater.from(parent.getContext())
-					.inflate(R.layout.movie_list_content, parent, false);
-			return new ViewHolder(view);
-		}
-
-		@Override
-		public void onBindViewHolder(final ViewHolder holder, final int position) {
-			holder.mItem = mValues.get(position);
-			Picasso.with(getApplicationContext()).load(holder.mItem.getPosterURL()).into(holder.mImageView);
-			holder.mView.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					if (mTwoPane) {
-						Bundle arguments = new Bundle();
-						arguments.putInt(MovieDetailFragment.ARG_ORDER_ID, position);
-						MovieDetailFragment fragment = new MovieDetailFragment();
-						fragment.setArguments(arguments);
-						getSupportFragmentManager().beginTransaction()
-								.replace(R.id.movie_detail_container, fragment)
-								.commit();
-					} else {
-						Context context = v.getContext();
-						Intent intent = new Intent(context, MovieDetailActivity.class);
-						intent.putExtra(MovieDetailFragment.ARG_ORDER_ID, position);
-						context.startActivity(intent);
-					}
-				}
-			});
-			holder.imageFrame.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-				@Override
-				public void onFocusChange(View v, boolean hasFocus) {
-					if (hasFocus)
-						v.performClick();
-				}
-			});
-		}
-
-		@Override
-		public int getItemCount() {
-			return mValues.size();
-		}
-
-		public class ViewHolder extends RecyclerView.ViewHolder {
-			public View mView;
-			public ImageView mImageView;
-			public FrameLayout imageFrame;
-			public MovieItem mItem;
-
-			public ViewHolder(View view) {
-				super(view);
-				mView = view;
-				mView.setClickable(true);
-				imageFrame = (FrameLayout) view.findViewById(R.id.image_frame);
-				mImageView = (ImageView) view.findViewById(R.id.content);
-			}
-
-			@Override
-			public String toString() {
-				return super.toString() + " '" + mItem.getTitle() + "'";
-			}
-		}
-
-
+		recyclerView.setLayoutManager(gridLayoutManager);
+		recyclerView.setAdapter(recyclerViewAdapter);
 	}
 }

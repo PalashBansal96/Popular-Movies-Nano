@@ -1,5 +1,6 @@
 package com.palashbansal.popularmoviesnano;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;

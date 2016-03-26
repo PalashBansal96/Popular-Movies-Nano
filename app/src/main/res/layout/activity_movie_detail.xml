@@ -4,7 +4,7 @@
 												 android:layout_width="match_parent"
 												 android:layout_height="match_parent"
 												 android:fitsSystemWindows="true"
-												 tools:context="com.palashbansal.popularmoviesnano.MovieDetailActivity"
+												 tools:movieListActivity="com.palashbansal.popularmoviesnano.MovieDetailActivity"
 												 tools:ignore="MergeRootFrame">
 
 	<android.support.design.widget.AppBarLayout
@@ -21,6 +21,7 @@
 			android:fitsSystemWindows="true"
 			app:contentScrim="?attr/colorPrimary"
 			app:layout_scrollFlags="scroll|exitUntilCollapsed"
+			android:elevation="12dp"
 			app:toolbarId="@+id/toolbar">
 
 			<android.support.v7.widget.Toolbar
@@ -50,6 +51,8 @@
 		android:layout_margin="@dimen/fab_margin"
 		android:src="@android:drawable/stat_notify_chat"
 		app:layout_anchor="@+id/movie_detail_container"
+		app:borderWidth="0dp"
+		app:elevation="12dp"
 		app:layout_anchorGravity="top|end"/>
 
 </android.support.design.widget.CoordinatorLayout>

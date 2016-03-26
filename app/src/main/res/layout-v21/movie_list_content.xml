@@ -4,20 +4,27 @@
 		android:layout_height="wrap_content"
 		android:layout_width="match_parent"
 		android:id="@+id/image_frame"
-		android:foreground="@drawable/selected_foreground"
 		android:clickable="true"
 		android:focusable="true"
 		android:focusableInTouchMode="true"
 		>
+	<FrameLayout
+			xmlns:android="http://schemas.android.com/apk/res/android"
+			android:layout_width="match_parent"
+			android:foreground="@drawable/ripple_custom"
+			android:layout_height="wrap_content"
+			>
 		<ImageView
 				android:id="@+id/content"
 				android:layout_width="match_parent"
+				android:foreground="@drawable/ripple_custom"
 				android:layout_height="wrap_content"
 				android:layout_margin="0dp"
 				android:scaleType="fitCenter"
-				android:foreground="@drawable/ripple_custom"
 				android:contentDescription="@string/poster_description"
 				android:adjustViewBounds="true"
+				android:transitionName="PosterImage"
 				/>
+	</FrameLayout>
 </FrameLayout>
 

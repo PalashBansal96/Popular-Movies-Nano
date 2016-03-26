@@ -1,7 +1,11 @@
 package com.palashbansal.popularmoviesnano.helpers;
 
+import android.annotation.SuppressLint;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
+import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,11 +27,11 @@ public class MovieItemAdapter
 		extends RecyclerView.Adapter<MovieItemAdapter.ViewHolder> {
 
 	private final List<MovieItem> movies;
-	private MovieListActivity context;
+	private MovieListActivity movieListActivity;
 
-	public MovieItemAdapter(List<MovieItem> items, MovieListActivity context) {
+	public MovieItemAdapter(List<MovieItem> items, MovieListActivity movieListActivity) {
 		movies = items;
-		this.context = context;
+		this.movieListActivity = movieListActivity;
 	}
 
 	@Override
@@ -40,17 +44,31 @@ public class MovieItemAdapter
 	@Override
 	public void onBindViewHolder(final ViewHolder holder, final int position) {
 		holder.item = movies.get(position);
-		Picasso.with(context).load(holder.item.getPosterURL()).into(holder.imageView);
+		Picasso.with(movieListActivity).load(holder.item.getPosterURL()).into(holder.imageView);
+		if(MovieListActivity.twoPane){
+			holder.imageFrame.setForeground(movieListActivity.getResources().getDrawable(R.drawable.selected_foreground));
+		}
 		holder.view.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if (MovieListActivity.twoPane) {
-					context.loadContentInPane(position);
+					movieListActivity.loadContentInPane(holder.getAdapterPosition());
 				} else {
-					Context context = v.getContext();
-					Intent intent = new Intent(context, MovieDetailActivity.class);
-					intent.putExtra(MovieDetailFragment.ARG_ORDER_ID, position);
-					context.startActivity(intent);
+					final Context context = v.getContext();
+					final Intent intent = new Intent(context, MovieDetailActivity.class);
+					intent.putExtra(MovieDetailFragment.ARG_ORDER_ID, holder.getAdapterPosition());
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+						new Handler().postDelayed(new Runnable() {
+							@SuppressLint("NewApi")
+							@Override
+							public void run() {
+								//noinspection unchecked
+								context.startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(movieListActivity, holder.imageView, "PosterImage").toBundle());
+							}
+						}, 200);
+					}else{
+						context.startActivity(intent);
+					}
 				}
 			}
 		});

@@ -9,7 +9,7 @@
 			  android:divider="?android:attr/dividerHorizontal"
 			  android:orientation="horizontal"
 			  android:showDividers="middle"
-			  tools:context="com.palashbansal.popularmoviesnano.MovieListActivity">
+			  tools:movieListActivity="com.palashbansal.popularmoviesnano.MovieListActivity">
 
 	<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
 											xmlns:tools="http://schemas.android.com/tools"
@@ -22,7 +22,7 @@
 											android:layout_marginRight="16dp"
 											android:background="?android:selectableItemBackground"
 											app:layoutManager="LinearLayoutManager"
-											tools:context="com.palashbansal.popularmoviesnano.MovieListActivity"
+											tools:movieListActivity="com.palashbansal.popularmoviesnano.MovieListActivity"
 											tools:listitem="@layout/movie_list_content"/>
 
 	<FrameLayout

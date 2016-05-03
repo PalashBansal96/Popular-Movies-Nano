@@ -1,4 +1,4 @@
-package com.palashbansal.popularmoviesnano.helpers;
+package com.palashbansal.popularmoviesnano.models;
 
 /**
  * Created by Palash on 3/6/2016.

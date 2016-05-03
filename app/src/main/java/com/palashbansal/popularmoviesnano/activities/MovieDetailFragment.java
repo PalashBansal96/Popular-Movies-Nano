@@ -1,4 +1,4 @@
-package com.palashbansal.popularmoviesnano;
+package com.palashbansal.popularmoviesnano.activities;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -9,8 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.palashbansal.popularmoviesnano.R;
 import com.palashbansal.popularmoviesnano.helpers.DBConnector;
-import com.palashbansal.popularmoviesnano.helpers.MovieItem;
+import com.palashbansal.popularmoviesnano.models.MovieItem;
 import com.squareup.picasso.Picasso;
 
 public class MovieDetailFragment extends Fragment {

@@ -1,4 +1,4 @@
-package com.palashbansal.popularmoviesnano;
+package com.palashbansal.popularmoviesnano.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import com.palashbansal.popularmoviesnano.R;
 import com.palashbansal.popularmoviesnano.helpers.DBConnector;
 
 public class MovieDetailActivity extends AppCompatActivity {

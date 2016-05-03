@@ -8,5 +8,5 @@
 										android:layout_height="match_parent"
 										android:background="?android:selectableItemBackground"
 										app:layoutManager="LinearLayoutManager"
-										tools:movieListActivity="com.palashbansal.popularmoviesnano.MovieListActivity"
+										tools:movieListActivity="com.palashbansal.popularmoviesnano.activities.MovieListActivity"
 										tools:listitem="@layout/movie_list_content"/>

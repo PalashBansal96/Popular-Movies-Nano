@@ -6,16 +6,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import com.palashbansal.popularmoviesnano.MovieDetailActivity;
-import com.palashbansal.popularmoviesnano.MovieDetailFragment;
-import com.palashbansal.popularmoviesnano.MovieListActivity;
+import com.palashbansal.popularmoviesnano.activities.MovieDetailActivity;
+import com.palashbansal.popularmoviesnano.activities.MovieDetailFragment;
+import com.palashbansal.popularmoviesnano.activities.MovieListActivity;
 import com.palashbansal.popularmoviesnano.R;
+import com.palashbansal.popularmoviesnano.models.MovieItem;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -46,7 +48,7 @@ public class MovieItemAdapter
 		holder.item = movies.get(position);
 		Picasso.with(movieListActivity).load(holder.item.getPosterURL()).into(holder.imageView);
 		if(MovieListActivity.twoPane){
-			holder.imageFrame.setForeground(movieListActivity.getResources().getDrawable(R.drawable.selected_foreground));
+			holder.imageFrame.setForeground(ResourcesCompat.getDrawable(movieListActivity.getResources(), R.drawable.selected_foreground, null));
 		}
 		holder.view.setOnClickListener(new View.OnClickListener() {
 			@Override

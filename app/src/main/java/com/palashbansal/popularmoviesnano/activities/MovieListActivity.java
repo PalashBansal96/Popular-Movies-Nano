@@ -1,6 +1,5 @@
-package com.palashbansal.popularmoviesnano;
+package com.palashbansal.popularmoviesnano.activities;
 
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -13,6 +12,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.palashbansal.popularmoviesnano.R;
+import com.palashbansal.popularmoviesnano.activities.MovieDetailFragment;
 import com.palashbansal.popularmoviesnano.helpers.DBConnector;
 import com.palashbansal.popularmoviesnano.helpers.MovieItemAdapter;
 import org.json.JSONObject;

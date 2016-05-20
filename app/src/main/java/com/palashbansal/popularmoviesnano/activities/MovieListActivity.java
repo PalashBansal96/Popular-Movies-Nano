@@ -37,6 +37,17 @@ public class MovieListActivity extends AppCompatActivity {
 
 //		Picasso.with(getApplicationContext()).setIndicatorsEnabled(true);  //TODO: Remove later
 
+		if (findViewById(R.id.movie_detail_container) != null) {
+			twoPane = true;
+		}
+
+		TMDBConnector.movieList.clear();
+		recyclerView = (RecyclerView) findViewById(R.id.movie_list);
+		recyclerViewAdapter = new MovieItemAdapter(TMDBConnector.movieList, this);
+		setupRecyclerView(recyclerViewAdapter);
+
+		refreshMovieList();
+
 		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
 		fab.setOnClickListener(new View.OnClickListener() {
@@ -57,15 +68,6 @@ public class MovieListActivity extends AppCompatActivity {
 			}
 		});
 
-
-		if (findViewById(R.id.movie_detail_container) != null) {
-			twoPane = true;
-		}
-
-		TMDBConnector.movieList.clear();
-		recyclerView = (RecyclerView) findViewById(R.id.movie_list);
-		recyclerViewAdapter = new MovieItemAdapter(TMDBConnector.movieList, this);
-		setupRecyclerView(recyclerViewAdapter);
 	}
 
 

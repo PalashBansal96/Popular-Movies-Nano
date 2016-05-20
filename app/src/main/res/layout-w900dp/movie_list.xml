@@ -25,12 +25,12 @@
 											tools:movieListActivity="com.palashbansal.popularmoviesnano.activities.MovieListActivity"
 											tools:listitem="@layout/movie_list_content"/>
 
-	<FrameLayout
+	<ScrollView
 		android:id="@+id/movie_detail_container"
 		android:layout_width="0dp"
 		android:layout_height="match_parent"
 		android:layout_weight="1">
 
-	</FrameLayout>
+	</ScrollView>
 
 </LinearLayout>

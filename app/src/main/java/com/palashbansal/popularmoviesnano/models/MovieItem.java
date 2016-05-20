@@ -1,5 +1,6 @@
 package com.palashbansal.popularmoviesnano.models;
 
+import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -98,14 +99,27 @@ public class MovieItem {
 			for(int i=0; i<results.length(); i++){
 				try {
 					JSONObject result = results.getJSONObject(i);
-					if(result.getString("type").equals(TRAILER_TYPE_TEXT) && result.getString("site").equals("Youtube")) {
+					if(result.getString("type").equals(TRAILER_TYPE_TEXT) && result.getString("site").toLowerCase().equals("youtube")) {
 						trailers.add(new TrailerItem(result.getString("id"), result.getString("key"), result.getString("name")));
 					}
+					Log.d("Trailer", String.valueOf(result.getString("site")));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 			}
 			return trailers;
+		}
+
+		public String getId() {
+			return id;
+		}
+
+		public String getKey() {
+			return key;
+		}
+
+		public String getName() {
+			return name;
 		}
 	}
 
@@ -113,11 +127,15 @@ public class MovieItem {
 		private String id;
 		private String author;
 		private String content;
+		private String url;
 
-		public ReviewItem(String id, String author, String content) {
+		public ReviewItem(String id, String author, String content, String url) {
 			this.id = id;
 			this.author = author;
-			this.content = content;
+			if(content.length()>200)
+				this.content = content.substring(0, 200) + " ...";
+			else this.content = content;
+			this.url = url;
 		}
 
 		public static List<ReviewItem> generateList(JSONArray results){
@@ -125,12 +143,28 @@ public class MovieItem {
 			for(int i=0; i<results.length(); i++){
 				try {
 					JSONObject result = results.getJSONObject(i);
-					reviews.add(new ReviewItem(result.getString("id"), result.getString("author"), result.getString("content")));
+					reviews.add(new ReviewItem(result.getString("id"), result.getString("author"), result.getString("content"), result.getString("url")));
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 			}
 			return reviews;
+		}
+
+		public String getId() {
+			return id;
+		}
+
+		public String getAuthor() {
+			return author;
+		}
+
+		public String getContent() {
+			return content;
+		}
+
+		public String getUrl() {
+			return url;
 		}
 	}
 }

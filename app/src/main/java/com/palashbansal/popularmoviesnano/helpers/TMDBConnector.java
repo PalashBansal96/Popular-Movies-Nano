@@ -2,6 +2,7 @@ package com.palashbansal.popularmoviesnano.helpers;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -22,8 +23,8 @@ public class TMDBConnector {
 	public static final List<MovieItem> movieList = new ArrayList<>();
 	private static final String BASE_URL = "https://api.themoviedb.org/3/";
 	private static final String MOVIE_PARAM = "movie/";
-	private static final String VIDEO_PARAM = "videos/";
-	private static final String REVIEW_PARAM = "reviews/";
+	private static final String VIDEO_PARAM = "/videos";
+	private static final String REVIEW_PARAM = "/reviews";
 	private static final String KEY_PARAM = "?api_key=" + APIKeys.TMDB_KEY;
 	private static final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/w185";
 	private static final String YOUTUBE_BASE_URL = "https://www.youtube.com/watch?v=";
@@ -64,7 +65,7 @@ public class TMDBConnector {
 			for(int i=0; i<results.length();i++){
 				JSONObject obj = results.getJSONObject(i);
 				movieList.add(new MovieItem(obj.getInt("id"), obj.getString("original_title"), generateImagePath(obj.getString("poster_path")),
-						generateImagePath(obj.getString("backdrop_path")), obj.getString("overview"), obj.getInt("vote_average"), "<Loading>"));
+						generateImagePath(obj.getString("backdrop_path")), obj.getString("overview"), obj.getInt("vote_average"), "Sometime after 1896."));
 				recyclerViewAdapter.notifyItemInserted(i);
 			}
 		} catch (JSONException ignored) {
@@ -109,6 +110,7 @@ public class TMDBConnector {
 					public void onResponse(JSONObject response) {
 						try {
 							movie.setTrailers(response.getJSONArray("results"));
+							Log.d("Trailers", response.getJSONArray("results").toString());
 						} catch (JSONException e) {
 							e.printStackTrace();
 						}
@@ -120,12 +122,12 @@ public class TMDBConnector {
 				},
 				errorListener
 		);
-		getTrailers(movie.getId(), context,
+		getReviews(movie.getId(), context,
 				new Response.Listener<JSONObject>() {
 					@Override
 					public void onResponse(JSONObject response) {
 						try {
-							movie.setTrailers(response.getJSONArray("results"));
+							movie.setReviews(response.getJSONArray("results"));
 						} catch (JSONException e) {
 							e.printStackTrace();
 						}
@@ -150,7 +152,7 @@ public class TMDBConnector {
 	public enum SortOrder {POPULAR, TOP_RATED}
 
 	public static abstract class Listener {
-		int count=0;
+		protected int count=0;
 		public abstract void onFinished(int error);
 	}
 }

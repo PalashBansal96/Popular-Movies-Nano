@@ -6,4 +6,7 @@
 	<string name="overview">Overview</string>
 	<string name="loading"><![CDATA[<Loading>]]></string>
 	<string name="sort_order">Sort By</string>
+	<string name="trailers">Trailers</string>
+	<string name="trailer_image">Trailer Thumbnail</string>
+	<string name="reviews">Reviews</string>
 </resources>

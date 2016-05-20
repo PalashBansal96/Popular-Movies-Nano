@@ -18,17 +18,31 @@ import java.util.List;
  * Created by Palash on 3/8/2016.
  */
 
-public class DBConnector {
+public class TMDBConnector {
 	public static final List<MovieItem> movieList = new ArrayList<>();
 	private static final String BASE_URL = "https://api.themoviedb.org/3/";
 	private static final String MOVIE_PARAM = "movie/";
+	private static final String VIDEO_PARAM = "videos/";
+	private static final String REVIEW_PARAM = "reviews/";
 	private static final String KEY_PARAM = "?api_key=" + APIKeys.TMDB_KEY;
 	private static final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/w185";
+	private static final String YOUTUBE_BASE_URL = "https://www.youtube.com/watch?v=";
 
 	public static void getMovie(int id, Context context, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener){
 		String url = BASE_URL + MOVIE_PARAM + id + KEY_PARAM;
 		getJSONFromGet(url, context, listener, errorListener);
 	}
+
+	public static void getTrailers(int id, Context context, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener){
+		String url = BASE_URL + MOVIE_PARAM + id + VIDEO_PARAM + KEY_PARAM;
+		getJSONFromGet(url, context, listener, errorListener);
+	}
+
+	public static void getReviews(int id, Context context, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener){
+		String url = BASE_URL + MOVIE_PARAM + id + REVIEW_PARAM + KEY_PARAM;
+		getJSONFromGet(url, context, listener, errorListener);
+	}
+
 
 	public static void discover(SortOrder order, Context context, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener){
 		String url = BASE_URL + MOVIE_PARAM + order.toString().toLowerCase() + KEY_PARAM;
@@ -63,28 +77,65 @@ public class DBConnector {
 		}
 	}
 
-	public static void getOtherDetails(final MovieItem movie, Context context, @Nullable final Listener listener) {
+	public static void getOtherDetails(final MovieItem movie, Context context, @Nullable final Listener listener) { //Release Date, Trailers, Reviews
+		Response.ErrorListener errorListener = new Response.ErrorListener() {
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				if (listener != null) {
+					listener.onFinished(1);
+				}
+			}
+		};
 		getMovie(movie.getId(), context,
 				new Response.Listener<JSONObject>() {
 					@Override
 					public void onResponse(JSONObject response) {
 						try {
 							movie.setRelease_date(response.getString("release_date"));
-						} catch (JSONException ignored) {
+						} catch (JSONException e) {
+							e.printStackTrace();
 						}
 						if (listener != null) {
+							listener.count++;
 							listener.onFinished(0);
 						}
 					}
 				},
-				new Response.ErrorListener() {
+				errorListener
+		);
+		getTrailers(movie.getId(), context,
+				new Response.Listener<JSONObject>() {
 					@Override
-					public void onErrorResponse(VolleyError error) {
+					public void onResponse(JSONObject response) {
+						try {
+							movie.setTrailers(response.getJSONArray("results"));
+						} catch (JSONException e) {
+							e.printStackTrace();
+						}
 						if (listener != null) {
-							listener.onFinished(1);
+							listener.count++;
+							listener.onFinished(0);
 						}
 					}
-				}
+				},
+				errorListener
+		);
+		getTrailers(movie.getId(), context,
+				new Response.Listener<JSONObject>() {
+					@Override
+					public void onResponse(JSONObject response) {
+						try {
+							movie.setTrailers(response.getJSONArray("results"));
+						} catch (JSONException e) {
+							e.printStackTrace();
+						}
+						if (listener != null) {
+							listener.count++;
+							listener.onFinished(0);
+						}
+					}
+				},
+				errorListener
 		);
 	}
 
@@ -98,7 +149,8 @@ public class DBConnector {
 
 	public enum SortOrder {POPULAR, TOP_RATED}
 
-	public interface Listener {
-		void onFinished(int error);
+	public static abstract class Listener {
+		int count=0;
+		public abstract void onFinished(int error);
 	}
 }

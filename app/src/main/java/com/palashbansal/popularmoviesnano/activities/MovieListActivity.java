@@ -13,17 +13,18 @@ import android.view.View;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.palashbansal.popularmoviesnano.R;
-import com.palashbansal.popularmoviesnano.activities.MovieDetailFragment;
-import com.palashbansal.popularmoviesnano.helpers.DBConnector;
+import com.palashbansal.popularmoviesnano.helpers.TMDBConnector;
 import com.palashbansal.popularmoviesnano.helpers.MovieItemAdapter;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MovieListActivity extends AppCompatActivity {
 
 	public static boolean twoPane;
-	private DBConnector.SortOrder order = DBConnector.SortOrder.POPULAR;
+	private TMDBConnector.SortOrder order = TMDBConnector.SortOrder.POPULAR;
 	private RecyclerView recyclerView;
 	private MovieItemAdapter recyclerViewAdapter;
+	private String latestResponse = "";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +35,7 @@ public class MovieListActivity extends AppCompatActivity {
 		setSupportActionBar(toolbar);
 		toolbar.setTitle(getTitle());
 
-//		Picasso.with(getApplicationContext()).setIndicatorsEnabled(true);  //TODO: Remove in Production
+//		Picasso.with(getApplicationContext()).setIndicatorsEnabled(true);  //TODO: Remove later
 
 		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
@@ -46,9 +47,9 @@ public class MovieListActivity extends AppCompatActivity {
 						.setSingleChoiceItems(R.array.sort_array, order.ordinal(), new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int which) {
 								if (which == 1) {
-									order = DBConnector.SortOrder.TOP_RATED;
+									order = TMDBConnector.SortOrder.TOP_RATED;
 								} else {
-									order = DBConnector.SortOrder.POPULAR;
+									order = TMDBConnector.SortOrder.POPULAR;
 								}
 								refreshMovieList();
 							}
@@ -61,34 +62,32 @@ public class MovieListActivity extends AppCompatActivity {
 			twoPane = true;
 		}
 
-		DBConnector.movieList.clear();
+		TMDBConnector.movieList.clear();
 		recyclerView = (RecyclerView) findViewById(R.id.movie_list);
-		recyclerViewAdapter = new MovieItemAdapter(DBConnector.movieList, this);
+		recyclerViewAdapter = new MovieItemAdapter(TMDBConnector.movieList, this);
 		setupRecyclerView(recyclerViewAdapter);
 	}
 
 
 	private void refreshMovieList() {
-		int temp_size = DBConnector.movieList.size();
-		DBConnector.movieList.clear();
+		int temp_size = TMDBConnector.movieList.size();
+		TMDBConnector.movieList.clear();
 		recyclerViewAdapter.notifyItemRangeRemoved(0, temp_size);
-		DBConnector.discover(order, this,
+		TMDBConnector.discover(order, this,
 				new Response.Listener<JSONObject>() {
 					@Override
 					public void onResponse(JSONObject response) {
-						DBConnector.generateMovieObjects(response, DBConnector.movieList, recyclerViewAdapter, new DBConnector.Listener() {
+						latestResponse = response.toString();
+						TMDBConnector.generateMovieObjects(response, TMDBConnector.movieList, recyclerViewAdapter, new TMDBConnector.Listener() {
 							@Override
 							public void onFinished(int error) {
-								if (twoPane && !DBConnector.movieList.isEmpty()) {
-									loadContentInPane(0);
-								}
+								if (twoPane && !TMDBConnector.movieList.isEmpty()) loadContentInPane(0);
 							}
 						});
 					}
 				}, new Response.ErrorListener() {
 					@Override
 					public void onErrorResponse(VolleyError error) {
-
 					}
 				});
 	}
@@ -110,6 +109,7 @@ public class MovieListActivity extends AppCompatActivity {
 			gridLayoutManager = new GridLayoutManager(this, 3);
 		} else {
 			if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+
 				gridLayoutManager = new GridLayoutManager(this, 2);
 			} else
 				gridLayoutManager = new GridLayoutManager(this, 4);
@@ -122,17 +122,24 @@ public class MovieListActivity extends AppCompatActivity {
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putInt("Sort_Order", order.ordinal());
+		outState.putString("Latest_Data", latestResponse);
 	}
 
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
-		order = DBConnector.SortOrder.values()[savedInstanceState.getInt("Sort_Order")];
-	}
-
-	@Override
-	protected void onPostCreate(Bundle savedInstanceState) {
-		super.onPostCreate(savedInstanceState);
+		order = TMDBConnector.SortOrder.values()[savedInstanceState.getInt("Sort_Order")];
+		try {
+			latestResponse = savedInstanceState.getString("Latest_Data");
+			TMDBConnector.generateMovieObjects(new JSONObject(latestResponse), TMDBConnector.movieList, recyclerViewAdapter, new TMDBConnector.Listener() {
+				@Override
+				public void onFinished(int error) {
+					if (twoPane && !TMDBConnector.movieList.isEmpty()) loadContentInPane(0);
+				}
+			});
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 		refreshMovieList();
 	}
 }

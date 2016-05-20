@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.palashbansal.popularmoviesnano.R;
-import com.palashbansal.popularmoviesnano.helpers.DBConnector;
+import com.palashbansal.popularmoviesnano.helpers.TMDBConnector;
 import com.palashbansal.popularmoviesnano.models.MovieItem;
 import com.squareup.picasso.Picasso;
 
@@ -27,7 +27,7 @@ public class MovieDetailFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 
 		if (getArguments().containsKey(ARG_ORDER_ID)) {
-			movie = DBConnector.movieList.get(getArguments().getInt(ARG_ORDER_ID));
+			movie = TMDBConnector.movieList.get(getArguments().getInt(ARG_ORDER_ID));
 
 			Activity activity = this.getActivity();
 			CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
@@ -43,7 +43,7 @@ public class MovieDetailFragment extends Fragment {
 		final View rootView = inflater.inflate(R.layout.movie_detail, container, false);
 
 		populateDetails(rootView);
-		DBConnector.getOtherDetails(movie, rootView.getContext(), new DBConnector.Listener() {
+		TMDBConnector.getOtherDetails(movie, rootView.getContext(), new TMDBConnector.Listener() {
 			@Override
 			public void onFinished(int error) {
 				if (error == 1) {

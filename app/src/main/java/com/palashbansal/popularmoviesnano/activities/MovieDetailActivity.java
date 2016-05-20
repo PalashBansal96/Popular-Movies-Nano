@@ -11,7 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import com.palashbansal.popularmoviesnano.R;
-import com.palashbansal.popularmoviesnano.helpers.DBConnector;
+import com.palashbansal.popularmoviesnano.helpers.TMDBConnector;
 
 public class MovieDetailActivity extends AppCompatActivity {
 
@@ -33,7 +33,7 @@ public class MovieDetailActivity extends AppCompatActivity {
 		ActionBar actionBar = getSupportActionBar();
 		if (actionBar != null) {
 			actionBar.setDisplayHomeAsUpEnabled(true);
-			String title = DBConnector.movieList.get(getIntent().getIntExtra(MovieDetailFragment.ARG_ORDER_ID, 0)).getTitle();
+			String title = TMDBConnector.movieList.get(getIntent().getIntExtra(MovieDetailFragment.ARG_ORDER_ID, 0)).getTitle();
 			actionBar.setTitle(title);
 		}
 		if (savedInstanceState == null) {

@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import com.palashbansal.popularmoviesnano.R;
+import com.palashbansal.popularmoviesnano.data.DatabaseHelper;
 import com.palashbansal.popularmoviesnano.helpers.TMDBConnector;
 
 public class MovieDetailActivity extends AppCompatActivity {
@@ -46,6 +47,7 @@ public class MovieDetailActivity extends AppCompatActivity {
 					.add(R.id.movie_detail_container, fragment)
 					.commit();
 		}
+
 	}
 
 	@Override

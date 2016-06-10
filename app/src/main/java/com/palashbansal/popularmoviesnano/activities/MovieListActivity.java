@@ -13,6 +13,7 @@ import android.view.View;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.palashbansal.popularmoviesnano.R;
+import com.palashbansal.popularmoviesnano.data.DatabaseHelper;
 import com.palashbansal.popularmoviesnano.helpers.TMDBConnector;
 import com.palashbansal.popularmoviesnano.helpers.MovieItemAdapter;
 import org.json.JSONException;
@@ -37,6 +38,7 @@ public class MovieListActivity extends AppCompatActivity {
 
 //		Picasso.with(getApplicationContext()).setIndicatorsEnabled(true);  //TODO: Remove later
 
+		DatabaseHelper.initialize(this);
 		if (findViewById(R.id.movie_detail_container) != null) {
 			twoPane = true;
 		}

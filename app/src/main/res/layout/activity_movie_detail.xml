@@ -49,10 +49,11 @@
 		android:layout_height="wrap_content"
 		android:layout_gravity="center_vertical|start"
 		android:layout_margin="@dimen/fab_margin"
-		android:src="@android:drawable/stat_notify_chat"
+		android:src="@drawable/heart_outline"
 		app:layout_anchor="@+id/movie_detail_container"
 		app:borderWidth="0dp"
 		app:elevation="12dp"
-		app:layout_anchorGravity="top|end"/>
+		app:layout_anchorGravity="top|end"
+	/>
 
 </android.support.design.widget.CoordinatorLayout>

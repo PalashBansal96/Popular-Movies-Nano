@@ -31,7 +31,8 @@ public class MovieDetailFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 
 		if (getArguments().containsKey(ARG_ORDER_ID)) {
-			movie = TMDBConnector.movieList.get(getArguments().getInt(ARG_ORDER_ID));
+			if(TMDBConnector.movieList.size()==0)movie=null;
+			else movie = TMDBConnector.movieList.get(getArguments().getInt(ARG_ORDER_ID));
 
 			Activity activity = this.getActivity();
 			CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
@@ -46,14 +47,16 @@ public class MovieDetailFragment extends Fragment {
 							 Bundle savedInstanceState) {
 		final View rootView = inflater.inflate(R.layout.movie_detail, container, false);
 
-		populateDetails(rootView);
-		TMDBConnector.getOtherDetails(movie, rootView.getContext(), new TMDBConnector.Listener() {
-			@Override
-			public void onFinished(int error) {
-				if(this.count>3)return;
-				populateDetails(rootView);
-			}
-		});
+		if(movie!=null) {
+			populateDetails(rootView);
+			TMDBConnector.getOtherDetails(movie, rootView.getContext(), new TMDBConnector.Listener() {
+				@Override
+				public void onFinished(int error) {
+					if(this.count>3)return;
+					populateDetails(rootView);
+				}
+			});
+		}
 		return rootView;
 	}
 
@@ -122,7 +125,11 @@ public class MovieDetailFragment extends Fragment {
 				}
 			});
 			setListViewHeightBasedOnChildren(reviewList, 3);
-			getActivity().findViewById(R.id.movie_detail_container).scrollTo(0,0);
+			if(getActivity()!=null) {
+				View container = getActivity().findViewById(R.id.movie_detail_container);
+				if (container != null)
+					container.scrollTo(0, 0);
+			}
 		}
 	}
 	public static void setListViewHeightBasedOnChildren(ListView listView, int limit) {

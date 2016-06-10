@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -40,9 +41,7 @@ public class MovieListActivity extends AppCompatActivity {
 //		Picasso.with(getApplicationContext()).setIndicatorsEnabled(true);  //TODO: Remove later
 
 		DatabaseHelper.initialize(this);
-		if (findViewById(R.id.movie_detail_container) != null) {
-			twoPane = true;
-		}
+		twoPane = findViewById(R.id.movie_detail_container) != null;
 
 		TMDBConnector.movieList.clear();
 		recyclerView = (RecyclerView) findViewById(R.id.movie_list);
@@ -73,6 +72,7 @@ public class MovieListActivity extends AppCompatActivity {
 
 		refreshMovieList();
 	}
+
 
 
 	private void refreshMovieList() {
@@ -139,9 +139,9 @@ public class MovieListActivity extends AppCompatActivity {
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
 		outState.putInt("Sort_Order", order.ordinal());
 		outState.putString("Latest_Data", latestResponse);
+		super.onSaveInstanceState(outState);
 	}
 
 	@Override

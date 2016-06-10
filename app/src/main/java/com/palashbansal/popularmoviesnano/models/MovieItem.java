@@ -1,7 +1,9 @@
 package com.palashbansal.popularmoviesnano.models;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,7 +34,7 @@ public class MovieItem {
 			COLUMN_OVERVIEW + " TEXT," +
 			COLUMN_POPULARITY + " INTEGER," +
 			COLUMN_RELEASE_DATE + " TEXT," +
-			COLUMN_FAVOURITE + " INTEGER," +
+			COLUMN_FAVOURITE + " INTEGER" +
 			" )";
 	private static final String TRAILER_TYPE_TEXT = "Trailer";
 	private int id;
@@ -72,8 +74,8 @@ public class MovieItem {
 	}
 
 
-	public String getDBString(){
-		return String.format(Locale.ENGLISH, "%s VALUES (%d, %s, %s, %s, %s, %d, %s, %d)", TABLE_NAME, id, title, posterURL, backdropURL, overview, popularity, release_date, favourite?1:0);
+	public void execInsertSQL(SQLiteDatabase db){
+		db.execSQL("REPLACE INTO " + TABLE_NAME + " VALUES (?, ?, ?, ?, ?, ?, ?, ?);", new Object[]{id, title, posterURL, backdropURL, overview, popularity, release_date, favourite?1:0});
 	}
 
 	public int getId() {
@@ -151,7 +153,7 @@ public class MovieItem {
 				COLUMN_ID + " TEXT PRIMARY KEY," +
 				COLUMN_KEY + " TEXT," +
 				COLUMN_NAME + " TEXT," +
-				COLUMN_MOVIE_ID + " INTEGER," +
+				COLUMN_MOVIE_ID + " INTEGER" +
 				" )";
 
 		private String id;
@@ -190,10 +192,9 @@ public class MovieItem {
 			return trailers;
 		}
 
-		public String getDBString(int movie_id){
-			return String.format(Locale.ENGLISH, "%s VALUES (%s, %s, %s, %d)", TABLE_NAME, id, key, name, movie_id);
+		public void execInsertSQL(SQLiteDatabase db, int movie_id){
+			db.execSQL("REPLACE INTO " + TABLE_NAME + " VALUES (?, ?, ?, ?);", new Object[]{id, key, name, movie_id});
 		}
-
 
 		public String getId() {
 			return id;
@@ -220,7 +221,7 @@ public class MovieItem {
 				COLUMN_CONTENT + " TEXT," +
 				COLUMN_URL + " TEXT," +
 				COLUMN_AUTHOR + " TEXT," +
-				COLUMN_MOVIE_ID + " INTEGER," +
+				COLUMN_MOVIE_ID + " INTEGER" +
 				" )";
 
 		private String id;
@@ -260,8 +261,8 @@ public class MovieItem {
 			return reviews;
 		}
 
-		public String getDBString(int movie_id){
-			return String.format(Locale.ENGLISH, "%s VALUES (%s, %s, %s, %s, %d)", TABLE_NAME, id, author, url, content, movie_id);
+		public void execInsertSQL(SQLiteDatabase db, int movie_id){
+			db.execSQL("REPLACE INTO " + TABLE_NAME + " VALUES (?, ?, ?, ?, ?);", new Object[]{id, author, url, content, movie_id});
 		}
 
 		public String getId() {

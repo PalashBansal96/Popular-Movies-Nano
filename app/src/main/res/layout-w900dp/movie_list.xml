@@ -25,12 +25,28 @@
 											tools:movieListActivity="com.palashbansal.popularmoviesnano.activities.MovieListActivity"
 											tools:listitem="@layout/movie_list_content"/>
 
-	<ScrollView
-		android:id="@+id/movie_detail_container"
-		android:layout_width="0dp"
-		android:layout_height="match_parent"
-		android:layout_weight="1">
+	<FrameLayout
+			android:layout_width="0dp"
+			android:layout_height="match_parent"
+			android:layout_weight="1"
+	>
+		<ScrollView
+				android:id="@+id/movie_detail_container"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+		/>
+		<android.support.design.widget.FloatingActionButton
+				android:id="@+id/fav_fab"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_margin="@dimen/fab_margin"
+				android:src="@drawable/heart_outline"
+				android:layout_gravity="bottom|end"
+				app:borderWidth="0dp"
+				app:elevation="12dp"
+		/>
+	</FrameLayout>
 
-	</ScrollView>
+
 
 </LinearLayout>

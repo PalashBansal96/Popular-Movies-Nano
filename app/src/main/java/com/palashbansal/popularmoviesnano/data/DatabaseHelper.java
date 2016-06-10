@@ -4,10 +4,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import com.palashbansal.popularmoviesnano.models.MovieItem;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,7 +17,7 @@ import java.util.Set;
  */
 public class DatabaseHelper extends SQLiteOpenHelper{
 
-	public static final int DATABASE_VERSION = 1;
+	public static final int DATABASE_VERSION = 2;
 	public static final String DATABASE_NAME = "Movies.db";
 	private static DatabaseHelper instance;
 	private SQLiteDatabase dbWrite;
@@ -78,13 +78,22 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
 	public static void updateMovie(MovieItem movie){
 		if(instance.dbWrite==null) getWriteDB();
-		instance.dbWrite.execSQL("REPLACE INTO " + movie.getDBString() + ";");
+		movie.execInsertSQL(instance.dbWrite);
 		for (MovieItem.TrailerItem trailer: movie.getTrailers()) {
-			instance.dbWrite.execSQL("REPLACE INTO " + trailer.getDBString(movie.getId()) + ";");
+			trailer.execInsertSQL(instance.dbWrite, movie.getId());
 		}
 		for (MovieItem.ReviewItem review: movie.getReviews()) {
-			instance.dbWrite.execSQL("REPLACE INTO " + review.getDBString(movie.getId()) + ";");
+			review.execInsertSQL(instance.dbWrite, movie.getId());
 		}
+	}
+
+	public static void updateMoviesAsync(final MovieItem movie){
+		AsyncTask.execute(new Runnable() {
+			@Override
+			public void run() {
+				updateMovie(movie);
+			}
+		});
 	}
 
 	public static void getAllMovie(List<MovieItem> movies, @Nullable String where){
@@ -111,6 +120,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 	}
 
 	public static Set<Integer> getFavouriteIDs(){
+		if(instance.dbRead==null) getReadDB();
 		Cursor movieCursor = instance.dbRead.rawQuery("SELECT " + MovieItem.COLUMN_ID + " FROM " + MovieItem.TABLE_NAME + " WHERE " + MovieItem.COLUMN_FAVOURITE + "=1;", new String[]{});
 		movieCursor.moveToFirst();
 		Set<Integer> movies = new HashSet<>();

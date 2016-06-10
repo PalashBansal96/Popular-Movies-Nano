@@ -13,7 +13,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Palash on 3/8/2016.
@@ -21,6 +23,7 @@ import java.util.List;
 
 public class TMDBConnector {
 	public static final List<MovieItem> movieList = new ArrayList<>();
+	public static Set<Integer> favouriteList = new HashSet<>();
 	private static final String BASE_URL = "https://api.themoviedb.org/3/";
 	private static final String MOVIE_PARAM = "movie/";
 	private static final String VIDEO_PARAM = "/videos";
@@ -64,8 +67,10 @@ public class TMDBConnector {
 			JSONArray results = json.getJSONArray("results");
 			for(int i=0; i<results.length();i++){
 				JSONObject obj = results.getJSONObject(i);
-				movieList.add(new MovieItem(obj.getInt("id"), obj.getString("original_title"), generateImagePath(obj.getString("poster_path")),
+				MovieItem m = (new MovieItem(obj.getInt("id"), obj.getString("original_title"), generateImagePath(obj.getString("poster_path")),
 						generateImagePath(obj.getString("backdrop_path")), obj.getString("overview"), obj.getInt("vote_average"), "Sometime after 1896."));
+				if(favouriteList.contains(m.getId())) m.setFavourite(true);
+				movieList.add(m);
 				recyclerViewAdapter.notifyItemInserted(i);
 			}
 		} catch (JSONException ignored) {

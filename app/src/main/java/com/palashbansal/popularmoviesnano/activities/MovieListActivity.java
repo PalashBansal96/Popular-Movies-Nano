@@ -2,6 +2,7 @@ package com.palashbansal.popularmoviesnano.activities;
 
 import android.content.DialogInterface;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -11,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.ListView;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.palashbansal.popularmoviesnano.R;
@@ -18,8 +20,12 @@ import com.palashbansal.popularmoviesnano.data.DatabaseHelper;
 import com.palashbansal.popularmoviesnano.helpers.AsyncTaskRunner;
 import com.palashbansal.popularmoviesnano.helpers.TMDBConnector;
 import com.palashbansal.popularmoviesnano.helpers.MovieItemAdapter;
+import com.palashbansal.popularmoviesnano.models.MovieItem;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MovieListActivity extends AppCompatActivity {
 
@@ -73,25 +79,38 @@ public class MovieListActivity extends AppCompatActivity {
 		refreshMovieList();
 	}
 
-
+	@Override
+	protected void onResume() {
+		if(order == TMDBConnector.SortOrder.FAVOURITES) refreshMovieList();
+		super.onResume();
+	}
 
 	private void refreshMovieList() {
 		int temp_size = TMDBConnector.movieList.size();
 		TMDBConnector.movieList.clear();
 		recyclerViewAdapter.notifyItemRangeRemoved(0, temp_size);
 		if(order== TMDBConnector.SortOrder.FAVOURITES){
+			final List<MovieItem> tempMovieItems = new ArrayList<>();
 			new AsyncTaskRunner().execute(new Runnable() {
 				@Override
 				public void run() {
-					DatabaseHelper.getFavouriteMovies(TMDBConnector.movieList);
+					DatabaseHelper.getFavouriteMovies(tempMovieItems);
 				}
 			}, new Runnable() {
 				@Override
 				public void run() {
+					TMDBConnector.movieList.clear();
+					TMDBConnector.movieList.addAll(tempMovieItems);
 					recyclerViewAdapter.notifyItemRangeInserted(0, TMDBConnector.movieList.size());
 				}
 			});
-		}else
+		}else {
+			AsyncTask.execute(new Runnable() {
+				@Override
+				public void run() {
+					TMDBConnector.favouriteList = DatabaseHelper.getFavouriteIDs();
+				}
+			});
 			TMDBConnector.discover(order, this,
 					new Response.Listener<JSONObject>() {
 						@Override
@@ -106,9 +125,10 @@ public class MovieListActivity extends AppCompatActivity {
 						}
 					}, new Response.ErrorListener() {
 						@Override
-						public void onErrorResponse(VolleyError error) {
-						}
-					});
+						public void onErrorResponse(VolleyError error) {}
+					}
+			);
+		}
 	}
 
 	public void loadContentInPane(int position) {

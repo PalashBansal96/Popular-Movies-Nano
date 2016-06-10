@@ -23,14 +23,6 @@ public class MovieDetailActivity extends AppCompatActivity {
 		Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
 		setSupportActionBar(toolbar);
 
-		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-		fab.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				Snackbar.make(view, "TODO: Added to favourite.", Snackbar.LENGTH_LONG).show();
-			}
-		});
-
 		ActionBar actionBar = getSupportActionBar();
 		if (actionBar != null) {
 			actionBar.setDisplayHomeAsUpEnabled(true);

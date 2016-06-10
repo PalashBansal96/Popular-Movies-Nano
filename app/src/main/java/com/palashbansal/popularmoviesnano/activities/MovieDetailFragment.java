@@ -6,14 +6,14 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.NestedScrollView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import com.palashbansal.popularmoviesnano.R;
+import com.palashbansal.popularmoviesnano.data.DatabaseHelper;
 import com.palashbansal.popularmoviesnano.helpers.TMDBConnector;
 import com.palashbansal.popularmoviesnano.models.MovieItem;
 import com.squareup.picasso.Picasso;
@@ -125,11 +125,32 @@ public class MovieDetailFragment extends Fragment {
 				}
 			});
 			setListViewHeightBasedOnChildren(reviewList, 3);
+			FloatingActionButton fav_fab = null;
 			if(getActivity()!=null) {
 				View container = getActivity().findViewById(R.id.movie_detail_container);
 				if (container != null)
 					container.scrollTo(0, 0);
+				fav_fab = (FloatingActionButton) getActivity().findViewById(R.id.fav_fab);
 			}
+			if(fav_fab==null)return;
+			if(movie.isFavourite()){
+				fav_fab.setImageDrawable(getResources().getDrawable(R.drawable.heart));
+				DatabaseHelper.updateMoviesAsync(movie);
+			}else {
+				fav_fab.setImageDrawable(getResources().getDrawable(R.drawable.heart_outline));
+			}
+			fav_fab.setOnClickListener(new FloatingActionButton.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					movie.setFavourite(!movie.isFavourite());
+					if(movie.isFavourite()){
+						((FloatingActionButton)v).setImageDrawable(getResources().getDrawable(R.drawable.heart));
+					}else{
+						((FloatingActionButton)v).setImageDrawable(getResources().getDrawable(R.drawable.heart_outline));
+					}
+					DatabaseHelper.updateMoviesAsync(movie);
+				}
+			});
 		}
 	}
 	public static void setListViewHeightBasedOnChildren(ListView listView, int limit) {

@@ -6,5 +6,4 @@ It uses TMDB API to fetch movies based on Popularity or Rating and display them 
 To compile add your TMDB API Key to `helpers/DBConnector.java`
 
 ## Status
-This app is currently completed till Stage 1 for the android nanodegree program.
-The movies are fetched fine but the UI at the moment is very basic.
+This app is currently completed till Stage 2 for the android nanodegree program.

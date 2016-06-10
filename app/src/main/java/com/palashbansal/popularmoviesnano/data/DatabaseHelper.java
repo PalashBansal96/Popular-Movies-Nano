@@ -9,6 +9,7 @@ import com.palashbansal.popularmoviesnano.models.MovieItem;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -86,12 +87,11 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 		}
 	}
 
-	public static ArrayList<MovieItem> getAllMovie(@Nullable String where){
+	public static void getAllMovie(List<MovieItem> movies, @Nullable String where){
 		if(where == null) where = "1";
 		if(instance.dbRead==null) getReadDB();
 		Cursor movieCursor = instance.dbRead.rawQuery("SELECT * FROM " + MovieItem.TABLE_NAME + " WHERE " + where + ";", new String[]{});
 		movieCursor.moveToFirst();
-		ArrayList<MovieItem> movies = new ArrayList<>();
 		while(!movieCursor.isAfterLast()){
 			MovieItem movie = new MovieItem(movieCursor);
 			Cursor trailerCursor = instance.dbRead.rawQuery("SELECT * FROM " + MovieItem.TrailerItem.TABLE_NAME + " WHERE " + MovieItem.TrailerItem.COLUMN_MOVIE_ID + "=" + movie.getId(), new String[]{});
@@ -104,11 +104,10 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 			movieCursor.moveToNext();
 		}
 		movieCursor.close();
-		return movies;
 	}
 
-	public static ArrayList<MovieItem> getFavouriteMovies(){
-		return getAllMovie(MovieItem.COLUMN_FAVOURITE + "=1");
+	public static void getFavouriteMovies(List<MovieItem> movies){
+		getAllMovie(movies, MovieItem.COLUMN_FAVOURITE + "=1");
 	}
 
 	public static Set<Integer> getFavouriteIDs(){

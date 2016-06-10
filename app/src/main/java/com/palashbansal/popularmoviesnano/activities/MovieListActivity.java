@@ -14,6 +14,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.palashbansal.popularmoviesnano.R;
 import com.palashbansal.popularmoviesnano.data.DatabaseHelper;
+import com.palashbansal.popularmoviesnano.helpers.AsyncTaskRunner;
 import com.palashbansal.popularmoviesnano.helpers.TMDBConnector;
 import com.palashbansal.popularmoviesnano.helpers.MovieItemAdapter;
 import org.json.JSONException;
@@ -48,8 +49,6 @@ public class MovieListActivity extends AppCompatActivity {
 		recyclerViewAdapter = new MovieItemAdapter(TMDBConnector.movieList, this);
 		setupRecyclerView(recyclerViewAdapter);
 
-		refreshMovieList();
-
 		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
 		fab.setOnClickListener(new View.OnClickListener() {
@@ -59,7 +58,9 @@ public class MovieListActivity extends AppCompatActivity {
 				builder.setTitle(R.string.sort_order)
 						.setSingleChoiceItems(R.array.sort_array, order.ordinal(), new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int which) {
-								if (which == 1) {
+								if (which == 2){
+									order = TMDBConnector.SortOrder.FAVOURITES;
+								} else if (which == 1) {
 									order = TMDBConnector.SortOrder.TOP_RATED;
 								} else {
 									order = TMDBConnector.SortOrder.POPULAR;
@@ -70,6 +71,7 @@ public class MovieListActivity extends AppCompatActivity {
 			}
 		});
 
+		refreshMovieList();
 	}
 
 
@@ -77,23 +79,36 @@ public class MovieListActivity extends AppCompatActivity {
 		int temp_size = TMDBConnector.movieList.size();
 		TMDBConnector.movieList.clear();
 		recyclerViewAdapter.notifyItemRangeRemoved(0, temp_size);
-		TMDBConnector.discover(order, this,
-				new Response.Listener<JSONObject>() {
-					@Override
-					public void onResponse(JSONObject response) {
-						latestResponse = response.toString();
-						TMDBConnector.generateMovieObjects(response, TMDBConnector.movieList, recyclerViewAdapter, new TMDBConnector.Listener() {
-							@Override
-							public void onFinished(int error) {
-								if (twoPane && !TMDBConnector.movieList.isEmpty()) loadContentInPane(0);
-							}
-						});
-					}
-				}, new Response.ErrorListener() {
-					@Override
-					public void onErrorResponse(VolleyError error) {
-					}
-				});
+		if(order== TMDBConnector.SortOrder.FAVOURITES){
+			new AsyncTaskRunner().execute(new Runnable() {
+				@Override
+				public void run() {
+					DatabaseHelper.getFavouriteMovies(TMDBConnector.movieList);
+				}
+			}, new Runnable() {
+				@Override
+				public void run() {
+					recyclerViewAdapter.notifyItemRangeInserted(0, TMDBConnector.movieList.size());
+				}
+			});
+		}else
+			TMDBConnector.discover(order, this,
+					new Response.Listener<JSONObject>() {
+						@Override
+						public void onResponse(JSONObject response) {
+							latestResponse = response.toString();
+							TMDBConnector.generateMovieObjects(response, TMDBConnector.movieList, recyclerViewAdapter, new TMDBConnector.Listener() {
+								@Override
+								public void onFinished(int error) {
+									if (twoPane && !TMDBConnector.movieList.isEmpty()) loadContentInPane(0);
+								}
+							});
+						}
+					}, new Response.ErrorListener() {
+						@Override
+						public void onErrorResponse(VolleyError error) {
+						}
+					});
 	}
 
 	public void loadContentInPane(int position) {

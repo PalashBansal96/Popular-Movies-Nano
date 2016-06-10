@@ -149,7 +149,7 @@ public class TMDBConnector {
 				context);
 	}
 
-	public enum SortOrder {POPULAR, TOP_RATED}
+	public enum SortOrder {POPULAR, TOP_RATED, FAVOURITES}
 
 	public static abstract class Listener {
 		protected int count=0;

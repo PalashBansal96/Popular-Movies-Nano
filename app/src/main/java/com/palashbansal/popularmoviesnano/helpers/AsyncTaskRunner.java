@@ -9,8 +9,9 @@ public class AsyncTaskRunner extends AsyncTask<Runnable, Void, Runnable>{
 
 	@Override
 	protected Runnable doInBackground(Runnable... params) {
-		params[0].run();
-		return params[1];
+		for(int i=0;i<params.length-1;i++)
+			params[i].run();
+		return params[params.length-1];
 	}
 
 	@Override
